@@ -1,8 +1,6 @@
 package lexer
 
 import (
-	"fmt"
-
 	"github.com/baybaraandrey/elephant/token"
 )
 
@@ -72,7 +70,6 @@ func (l *Lexer) NextToken() token.Token {
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
 	case ',':
-		fmt.Println("read comma")
 		tok = newToken(token.COMMA, l.ch)
 	case 0:
 		tok.Literal = ""
