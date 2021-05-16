@@ -22,6 +22,13 @@ func (l *Lexer) readChar() {
 	l.readPosition++
 }
 
+func (l *Lexer) peakChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
+}
+
 func (l *Lexer) eatWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
@@ -52,7 +59,21 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		if l.peakChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.EQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.ASSIGN, l.ch)
+		}
+	case '!':
+		if l.peakChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.NEQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.NOT, l.ch)
+		}
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
 	case '+':
@@ -70,9 +91,21 @@ func (l *Lexer) NextToken() token.Token {
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
 	case '<':
-		tok = newToken(token.LESS, l.ch)
+		if l.peakChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.LEQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.LESS, l.ch)
+		}
 	case '>':
-		tok = newToken(token.GREATER, l.ch)
+		if l.peakChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token.Token{Type: token.GEQ, Literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(token.GREATER, l.ch)
+		}
 	case ',':
 		tok = newToken(token.COMMA, l.ch)
 	case 0:

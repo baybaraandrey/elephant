@@ -36,7 +36,11 @@ const (
 	SEMI    // ;
 	LESS    // <
 	ASSIGN  // =
-	EQUAL   // ==
+	NOT     // !
+	EQ      // ==
+	NEQ     // !=
+	LEQ     // <=
+	GEQ     // >=
 	DEFINE  // :=
 
 	GREATER    // >
@@ -88,7 +92,11 @@ var tokens = [...]string{
 	SEMI:    ";",
 	LESS:    "<",
 	ASSIGN:  "=",
-	EQUAL:   "==",
+	NOT:     "!",
+	EQ:      "==",
+	NEQ:     "!=",
+	LEQ:     "<=",
+	GEQ:     ">=",
 	DEFINE:  ":=",
 
 	GREATER:    ">",
