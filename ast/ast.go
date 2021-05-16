@@ -1,8 +1,6 @@
 package ast
 
-import (
-	"github.com/baybaraandrey.com/elephant"
-)
+import "github.com/baybaraandrey/elephant/token"
 
 type Node interface {
 	TokenLiteral() string
@@ -30,15 +28,14 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
-type LetStatement struct {
-	Token token.Token // the token.LET token
-	Name
-	*Identifier
+type VarStatement struct {
+	Token token.Token // the token.VAR token
+	Name  *Identifier
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
+func (ls *VarStatement) statementNode()       {}
+func (ls *VarStatement) TokenLiteral() string { return ls.Token.Literal }
 
 type Identifier struct {
 	Token token.Token // the token.INDENT token
@@ -47,4 +44,3 @@ type Identifier struct {
 
 func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
-
