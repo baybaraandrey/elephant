@@ -74,6 +74,8 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = newToken(token.NOT, l.ch)
 		}
+	case ';':
+		tok = newToken(token.SEMI, l.ch)
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
 	case '+':
