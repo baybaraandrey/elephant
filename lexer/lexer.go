@@ -69,6 +69,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRACE, l.ch)
 	case '}':
 		tok = newToken(token.RBRACE, l.ch)
+	case '<':
+		tok = newToken(token.LESS, l.ch)
+	case '>':
+		tok = newToken(token.GREATER, l.ch)
 	case ',':
 		tok = newToken(token.COMMA, l.ch)
 	case 0:
@@ -93,8 +97,13 @@ func (l *Lexer) NextToken() token.Token {
 }
 
 var keywords = map[string]token.TokenType{
-	"def": token.DEF,
-	"var": token.VAR,
+	"def":    token.DEF,
+	"var":    token.VAR,
+	"if":     token.IF,
+	"else":   token.ELSE,
+	"return": token.RETURN,
+	"true":   token.TRUE,
+	"false":  token.FALSE,
 }
 
 func LookupIndent(ident string) token.TokenType {

@@ -52,8 +52,14 @@ const (
 
 	keywords_b
 	// Keywords
-	DEF // def
-	VAR // var
+	DEF    // def
+	VAR    // var
+	IF     // if
+	ELSE   // else
+	RETURN // return
+	TRUE   // true
+	FALSE  // false
+
 	keywords_e
 )
 
@@ -95,8 +101,13 @@ var tokens = [...]string{
 	RBRACE:     "}",
 	TILDE:      "~",
 
-	DEF: "def",
-	VAR: "var",
+	DEF:    "def",
+	VAR:    "var",
+	IF:     "if",
+	ELSE:   "else",
+	RETURN: "return",
+	TRUE:   "true",
+	FALSE:  "false",
 }
 
 func (tok TokenType) String() string {

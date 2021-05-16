@@ -1,8 +1,9 @@
 package lexer
 
 import (
-	"github.com/baybaraandrey/elephant/token"
 	"testing"
+
+	"github.com/baybaraandrey/elephant/token"
 )
 
 func TestNextToken(t *testing.T) {
@@ -10,6 +11,16 @@ func TestNextToken(t *testing.T) {
 	var number = 10
 	var fu = def(a, b) { a + b }
 	var sum = fu(1, 2)
+	var add = def(x, y) {
+		x + y
+	}
+	def nameOfFunction() {
+		if 5 < 10 {
+			return true
+		} else {
+			return false
+		}
+	}
 	`
 
 	tests := []struct {
@@ -43,6 +54,39 @@ func TestNextToken(t *testing.T) {
 		{token.COMMA, ","},
 		{token.INT, "2"},
 		{token.RPAR, ")"},
+		{token.VAR, "var"},
+		{token.INDENT, "add"},
+		{token.ASSIGN, "="},
+		{token.DEF, "def"},
+		{token.LPAR, "("},
+		{token.INDENT, "x"},
+		{token.COMMA, ","},
+		{token.INDENT, "y"},
+		{token.RPAR, ")"},
+		{token.LBRACE, "{"},
+		{token.INDENT, "x"},
+		{token.PLUS, "+"},
+		{token.INDENT, "y"},
+		{token.RBRACE, "}"},
+		{token.DEF, "def"},
+		{token.INDENT, "nameOfFunction"},
+		{token.LPAR, "("},
+		{token.RPAR, ")"},
+		{token.LBRACE, "{"},
+		{token.IF, "if"},
+		{token.INT, "5"},
+		{token.LESS, "<"},
+		{token.INT, "10"},
+		{token.LBRACE, "{"},
+		{token.RETURN, "return"},
+		{token.TRUE, "true"},
+		{token.RBRACE, "}"},
+		{token.ELSE, "else"},
+		{token.LBRACE, "{"},
+		{token.RETURN, "return"},
+		{token.FALSE, "false"},
+		{token.RBRACE, "}"},
+		{token.RBRACE, "}"},
 		{token.EOF, ""},
 	}
 
