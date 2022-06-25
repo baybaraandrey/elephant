@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/baybaraandrey/elephant/token"
@@ -25,6 +24,8 @@ func TestNextToken(t *testing.T) {
 	}
 	10 != 10
 	5 == 5
+	"foobar"
+	"foo bar"
 	`
 	tests := []struct {
 		expectedType    token.TokenType
@@ -108,6 +109,8 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "5"},
 		{token.EQ, "=="},
 		{token.INT, "5"},
+		{token.STRING, "foobar"},
+		{token.STRING, "foo bar"},
 		{token.EOF, ""},
 	}
 
@@ -115,7 +118,6 @@ func TestNextToken(t *testing.T) {
 
 	for i, tt := range tests {
 		tok := l.NextToken()
-		fmt.Println(tok)
 		if tok.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. expected=%q, got=%q",
 				i, tt.expectedType, tok.Type)
