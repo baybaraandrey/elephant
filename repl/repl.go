@@ -7,6 +7,7 @@ import (
 
 	"github.com/baybaraandrey/elephant/evaluator"
 	"github.com/baybaraandrey/elephant/lexer"
+	"github.com/baybaraandrey/elephant/object"
 	"github.com/baybaraandrey/elephant/parser"
 )
 
@@ -14,6 +15,7 @@ const PROMPT = ">>> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -33,7 +35,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program)
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
