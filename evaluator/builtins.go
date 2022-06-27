@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/baybaraandrey/elephant/object"
@@ -41,6 +42,15 @@ var builtins = map[string]*object.Builtin{
 			arr := args[0].(*object.Array)
 			if len(arr.Elements) > 0 {
 				return arr.Elements[0]
+			}
+
+			return NULL
+		},
+	},
+	"puts": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
 			}
 
 			return NULL
