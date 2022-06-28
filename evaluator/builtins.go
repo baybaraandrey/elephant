@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 
@@ -49,10 +50,31 @@ var builtins = map[string]*object.Builtin{
 	},
 	"puts": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
-			for _, arg := range args {
-				fmt.Println(arg.Inspect())
+			var out bytes.Buffer
+			for index, arg := range args {
+				out.WriteString(arg.Inspect())
+				if index+1 == len(args) {
+					continue
+				}
+				out.WriteString(" ")
 			}
-
+			out.WriteString("\n")
+			fmt.Print(out.String())
+			return NULL
+		},
+	},
+	"print": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			var out bytes.Buffer
+			for index, arg := range args {
+				out.WriteString(arg.Inspect())
+				if index+1 == len(args) {
+					continue
+				}
+				out.WriteString(" ")
+			}
+			out.WriteString("\n")
+			fmt.Print(out.String())
 			return NULL
 		},
 	},

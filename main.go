@@ -7,8 +7,11 @@ import (
 	"os"
 	"os/user"
 
+	"github.com/baybaraandrey/elephant/config"
 	"github.com/baybaraandrey/elephant/repl"
 )
+
+var debug = flag.Bool("d", false, "debug mode")
 
 func main() {
 	flag.Parse()
@@ -18,16 +21,20 @@ func main() {
 		panic(err)
 	}
 
+	conf := config.Config{Debug: *debug, Mode: config.INTERACTIVE}
+
 	if len(args) > 0 {
+		conf.Mode = config.FROM_FILE
+
 		filePath := args[0]
 		file, err := os.Open(filePath)
 		if err != nil {
 			log.Fatalf("%s", err)
 		}
 
-		repl.Start(file, os.Stdout, repl.NON_INTERACTIVE)
+		repl.Start(file, os.Stdout, conf)
 	} else {
 		fmt.Printf("Hello %s! This is Elephant programming language.\n", user.Username)
-		repl.Start(os.Stdin, os.Stdout, repl.INTERACTIVE)
+		repl.Start(os.Stdin, os.Stdout, conf)
 	}
 }

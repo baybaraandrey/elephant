@@ -443,12 +443,20 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 }
 
 func (p *Parser) parseFunctionLiteral() ast.Expression {
+	var ident *ast.Identifier
 	lit := &ast.FunctionLiteral{Token: p.curToken}
+
+	if p.peekTokenIs(token.IDENT) {
+		p.nextToken()
+		ident = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	}
 
 	if !p.expectPeek(token.LPAREN) {
 		return nil
 	}
 
+	lit.Name = ident
 	lit.Parameters = p.parseFunctionParameters()
 
 	if !p.expectPeek(token.LBRACE) {

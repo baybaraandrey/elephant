@@ -5,28 +5,21 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/baybaraandrey/elephant/config"
 	"github.com/baybaraandrey/elephant/evaluator"
 	"github.com/baybaraandrey/elephant/lexer"
 	"github.com/baybaraandrey/elephant/object"
 	"github.com/baybaraandrey/elephant/parser"
 )
 
-type ReplMode int
-
-const (
-	_ ReplMode = iota
-	INTERACTIVE
-	NON_INTERACTIVE
-)
-
 const PROMPT = ">>> "
 
-func Start(in io.Reader, out io.Writer, mode ReplMode) {
+func Start(in io.Reader, out io.Writer, conf config.Config) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
 
 	for {
-		if mode == INTERACTIVE {
+		if conf.Mode == config.INTERACTIVE {
 			fmt.Printf(PROMPT)
 		}
 		scanned := scanner.Scan()
@@ -46,7 +39,7 @@ func Start(in io.Reader, out io.Writer, mode ReplMode) {
 		}
 
 		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil && mode == INTERACTIVE {
+		if evaluated != nil && conf.Mode == config.INTERACTIVE {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}

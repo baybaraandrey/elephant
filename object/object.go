@@ -67,6 +67,7 @@ func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
 
 type Function struct {
+	Name       *ast.Identifier
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement
 	Env        *Environment
@@ -82,6 +83,10 @@ func (f *Function) Inspect() string {
 	}
 
 	out.WriteString("fn")
+	if f.Name != nil {
+		out.WriteString(" ")
+		out.WriteString(f.Name.String())
+	}
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") {\n")

@@ -66,7 +66,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.FunctionLiteral:
 		params := node.Parameters
 		body := node.Body
-		return &object.Function{Parameters: params, Env: env, Body: body}
+		name := node.Name
+		function := &object.Function{Name: name, Parameters: params, Env: env, Body: body}
+		if name != nil {
+			env.Set(name.String(), function)
+		}
+		return function
 	case *ast.CallExpression:
 		function := Eval(node.Function, env)
 		if isError(function) {
@@ -76,7 +81,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
-
 		return applyFunction(function, args)
 	case *ast.StringLiteral:
 		return &object.String{Value: node.Value}
@@ -231,6 +235,10 @@ func evalIdentifier(
 
 	if builtin, ok := builtins[node.Value]; ok {
 		return builtin
+	}
+
+	if namedFunc, ok := env.Get(node.Value); ok {
+		return namedFunc
 	}
 
 	return newError("identifier not found: " + node.Value)
