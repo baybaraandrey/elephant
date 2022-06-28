@@ -495,8 +495,7 @@ false: 6
 
 func TestHashIndexExpressions(t *testing.T) {
 	tests := []struct {
-		input
-		string
+		input    string
 		expected interface{}
 	}{
 		{
@@ -519,11 +518,8 @@ func TestHashIndexExpressions(t *testing.T) {
 			`{5: 5}[5]`,
 			5,
 		},
-		{},
-		{},
-		`{true:5,
-5}[true]`,
-		`{false:5}[false]`,
+		{`{true:5}[true]`, 5},
+		{`{false:5}[false]`, 5},
 	}
 
 	for _, tt := range tests {

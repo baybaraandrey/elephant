@@ -801,3 +801,22 @@ func TestParsingHashLiteralsWithExpressions(t *testing.T) {
 		testFunc(value)
 	}
 }
+
+func TestCommentLiteral(t *testing.T) {
+	tests := []struct {
+		input         string
+		expectedValue interface{}
+	}{
+		{"#!/usr/bin/python3", nil},
+		{"# some long comment", nil},
+		{"##some another comment", nil},
+	}
+
+	for _, tt := range tests {
+		program := createParseProgram(tt.input, t)
+
+		if len(program.Statements) != 0 {
+			t.Fatalf("program.Statements does not contain 0 statements. got=%d", len(program.Statements))
+		}
+	}
+}

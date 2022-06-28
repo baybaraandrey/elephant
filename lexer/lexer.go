@@ -84,6 +84,9 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.RBRACKET, l.ch)
 	case ':':
 		tok = newToken(token.COLON, l.ch)
+	case '#':
+		tok = newToken(token.COMMENT, l.ch)
+		l.skipLine()
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -144,6 +147,15 @@ func (l *Lexer) peekChar() byte {
 		return 0
 	} else {
 		return l.input[l.readPosition]
+	}
+}
+
+func (l *Lexer) skipLine() {
+	for l.ch != '\n' {
+		if l.ch == 0 {
+			break
+		}
+		l.readChar()
 	}
 }
 

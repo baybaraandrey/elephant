@@ -11,14 +11,24 @@ import (
 	"github.com/baybaraandrey/elephant/parser"
 )
 
+type ReplMode int
+
+const (
+	_ ReplMode = iota
+	INTERACTIVE
+	NON_INTERACTIVE
+)
+
 const PROMPT = ">>> "
 
-func Start(in io.Reader, out io.Writer) {
+func Start(in io.Reader, out io.Writer, mode ReplMode) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
 
 	for {
-		fmt.Printf(PROMPT)
+		if mode == INTERACTIVE {
+			fmt.Printf(PROMPT)
+		}
 		scanned := scanner.Scan()
 		if !scanned {
 			return
@@ -36,7 +46,7 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil {
+		if evaluated != nil && mode == INTERACTIVE {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}
