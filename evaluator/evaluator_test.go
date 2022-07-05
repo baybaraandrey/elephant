@@ -285,7 +285,11 @@ func TestAssignStatements(t *testing.T) {
 }
 
 func TestFunctionObject(t *testing.T) {
-	input := "fn(x) { x + 2; };"
+	input := `
+fn add(x) {
+	x + 2;
+};
+`
 
 	evaluated := testEval(input)
 	fn, ok := evaluated.(*object.Function)

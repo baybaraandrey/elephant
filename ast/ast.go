@@ -371,3 +371,24 @@ type ForStatement struct {
 	Post  Statement
 	Body  *BlockStatement
 }
+
+func (fs *ForStatement) statementNode()       {}
+func (fs *ForStatement) TokenLiteral() string { return fs.Token.Literal }
+func (fs *ForStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(fs.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(fs.Init.String())
+	out.WriteString(fs.Cond.String())
+	out.WriteString(";")
+	out.WriteString(fs.Post.String())
+	out.WriteString(")")
+	out.WriteString("{")
+	if fs.Body != nil {
+		out.WriteString(fs.Body.String())
+	}
+	out.WriteString("}")
+
+	return out.String()
+}

@@ -30,6 +30,14 @@ func TestNextToken(t *testing.T) {
 	{"foo": "bar"}
 	#
 	for(let i = 0; i<10; i = i + 1)
+
+
+fn add(a, b) {
+    a + b;
+};
+
+
+
 	`
 	tests := []struct {
 		expectedType    token.TokenType
@@ -147,6 +155,22 @@ func TestNextToken(t *testing.T) {
 		{token.PLUS, "+"},
 		{token.INT, "1"},
 		{token.RPAREN, ")"},
+
+		// named function
+		{token.FUNCTION, "fn"},
+		{token.IDENT, "add"},
+		{token.LPAREN, "("},
+		{token.IDENT, "a"},
+		{token.COMMA, ","},
+		{token.IDENT, "b"},
+		{token.RPAREN, ")"},
+		{token.LBRACE, "{"},
+		{token.IDENT, "a"},
+		{token.PLUS, "+"},
+		{token.IDENT, "b"},
+		{token.SEMICOLON, ";"},
+		{token.RBRACE, "}"},
+		{token.SEMICOLON, ";"},
 
 		{token.EOF, ""},
 	}

@@ -67,8 +67,8 @@ func TestAssignStatement(t *testing.T) {
 }
 
 func testAssignStatement(t *testing.T, s ast.Statement, name string) bool {
-	if s.TokenLiteral() != "x" {
-		t.Errorf("s.TokenLiteral not 'x'. got=%q", s.TokenLiteral())
+	if s.TokenLiteral() != name {
+		t.Errorf("s.TokenLiteral not '%s'. got=%q", name, s.TokenLiteral())
 		return false
 	}
 
@@ -543,6 +543,55 @@ func TestIfExpression(t *testing.T) {
 
 }
 
+func TestForStatement(t *testing.T) {
+	input := `
+		for(i = 0; i < 10; i = i + 1;) {
+
+		}
+	`
+	program := createParseProgram(input, t)
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ForStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not %T. got=%T", &ast.ForStatement{},
+			program.Statements[0])
+	}
+
+	initStmt, ok := stmt.Init.(*ast.AssignStatement)
+	if !ok {
+		t.Fatalf("stmt.Init is not %T. got=%T", &ast.AssignStatement{}, stmt.Init)
+	}
+	if !testAssignStatement(t, initStmt, "i") {
+		return
+	}
+
+	val := initStmt.Value
+	if !testLiteralExpression(t, val, 0) {
+		return
+	}
+
+	condExpr, ok := stmt.Cond.(*ast.InfixExpression)
+	if !ok {
+		t.Fatalf("stmt.Cond is not %T. got=%T", &ast.InfixExpression{}, stmt.Cond)
+	}
+	if !testInfixExpression(t, condExpr, "i", "<", 10) {
+		return
+	}
+
+	postStmt, ok := stmt.Post.(*ast.AssignStatement)
+	if !ok {
+		t.Fatalf("stmt.Post is not %T. got=%T", &ast.AssignStatement{}, stmt.Post)
+	}
+	if !testAssignStatement(t, postStmt, "i") {
+		return
+	}
+
+}
+
 func TestIfElseExpression(t *testing.T) {
 	input := `if (x < y) { x } else { y }`
 
@@ -644,7 +693,13 @@ func TestFunctionLiteralParsing(t *testing.T) {
 }
 
 func TestNamedFunctionLiteralParsing(t *testing.T) {
-	input := `fn add(x, y) { x + y; }`
+	input := `
+
+fn add(x, y) {
+	x + y;
+};
+
+`
 
 	program := createParseProgram(input, t)
 	if len(program.Statements) != 1 {

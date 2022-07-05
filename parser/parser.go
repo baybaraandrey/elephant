@@ -228,9 +228,43 @@ func (p *Parser) parseStatement() ast.Statement {
 	case tokenType == token.IDENT &&
 		p.peekTokenIs(token.ASSIGN):
 		return p.parseAssignStatement()
+	case tokenType == token.FOR:
+		return p.parseForStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseForStatement() *ast.ForStatement {
+	stmt := &ast.ForStatement{Token: p.curToken}
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	p.nextToken()
+
+	pp := p.parseAssignStatement()
+	stmt.Init = pp
+
+	p.nextToken()
+	ppp := p.parseExpression(LOWEST)
+
+	stmt.Cond = ppp
+	p.nextToken()
+	p.nextToken()
+
+	pt := p.parseAssignStatement()
+	stmt.Post = pt
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	stmt.Body = p.parseBlockStatement()
+
+	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
@@ -269,7 +303,6 @@ func (p *Parser) parseAssignStatement() *ast.AssignStatement {
 	// get value
 	p.nextToken()
 	stmt.Value = p.parseExpression(LOWEST)
-
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -474,7 +507,6 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 	if p.peekTokenIs(token.IDENT) {
 		p.nextToken()
 		ident = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-
 	}
 
 	if !p.expectPeek(token.LPAREN) {

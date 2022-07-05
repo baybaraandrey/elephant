@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 
 	"github.com/baybaraandrey/elephant/config"
 	"github.com/baybaraandrey/elephant/evaluator"
@@ -15,34 +17,47 @@ import (
 const PROMPT = ">>> "
 
 func Start(in io.Reader, out io.Writer, conf config.Config) {
-	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
 
-	for {
-		if conf.Mode == config.INTERACTIVE {
+	if conf.Mode == config.INTERACTIVE {
+		scanner := bufio.NewScanner(in)
+		for {
 			fmt.Printf(PROMPT)
-		}
-		scanned := scanner.Scan()
-		if !scanned {
-			return
-		}
+			scanned := scanner.Scan()
+			if !scanned {
+				return
+			}
 
-		line := scanner.Text()
+			line := scanner.Text()
 
-		l := lexer.New(line)
+			l := lexer.New(line)
+			p := parser.New(l)
+
+			program := p.ParseProgram()
+			if len(p.Errors()) != 0 {
+				printParseErrors(out, p.Errors())
+				continue
+			}
+
+			evaluated := evaluator.Eval(program, env)
+			if evaluated != nil {
+				io.WriteString(out, evaluated.Inspect())
+				io.WriteString(out, "\n")
+			}
+		}
+	} else {
+		input, err := ioutil.ReadAll(in)
+		if err != nil {
+			log.Fatal(err)
+		}
+		l := lexer.New(string(input))
 		p := parser.New(l)
 
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
 			printParseErrors(out, p.Errors())
-			continue
 		}
-
-		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil && conf.Mode == config.INTERACTIVE {
-			io.WriteString(out, evaluated.Inspect())
-			io.WriteString(out, "\n")
-		}
+		evaluator.Eval(program, env)
 	}
 }
 
