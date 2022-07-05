@@ -38,6 +38,59 @@ func TestLetStatement(t *testing.T) {
 	}
 }
 
+func TestAssignStatement(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      interface{}
+	}{
+		{"let x = 5; x = 1;", "x", 1},
+	}
+
+	for _, tt := range tests {
+		program := createParseProgram(tt.input, t)
+
+		if len(program.Statements) != 2 {
+			t.Fatalf("program.Statements does not contain 2 statements. got=%d", len(program.Statements))
+		}
+
+		stmt := program.Statements[1]
+		if !testAssignStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+
+		val := stmt.(*ast.AssignStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
+func testAssignStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "x" {
+		t.Errorf("s.TokenLiteral not 'x'. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	assignStmt, ok := s.(*ast.AssignStatement)
+	if !ok {
+		t.Errorf("s not %T. got=%T", &ast.AssignStatement{}, s)
+		return false
+	}
+
+	if assignStmt.Name.Value != name {
+		t.Errorf("assignStmt.Name.Value not '%s'. got=%s", name, assignStmt.Name.Value)
+		return false
+	}
+
+	if assignStmt.Name.TokenLiteral() != name {
+		t.Errorf("s.Name not '%s'. got=%s", name, assignStmt.Name)
+		return false
+	}
+
+	return true
+}
+
 func TestReturnStatement(t *testing.T) {
 	input := `
 		return 5;

@@ -29,11 +29,13 @@ func TestNextToken(t *testing.T) {
 	[1, 2];
 	{"foo": "bar"}
 	#
+	for(let i = 0; i<10; i = i + 1)
 	`
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
+
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
@@ -126,6 +128,26 @@ func TestNextToken(t *testing.T) {
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
 		{token.COMMENT, "#"},
+
+		// for statement
+		{token.FOR, "for"},
+		{token.LPAREN, "("},
+		{token.LET, "let"},
+		{token.IDENT, "i"},
+		{token.ASSIGN, "="},
+		{token.INT, "0"},
+		{token.SEMICOLON, ";"},
+		{token.IDENT, "i"},
+		{token.LT, "<"},
+		{token.INT, "10"},
+		{token.SEMICOLON, ";"},
+		{token.IDENT, "i"},
+		{token.ASSIGN, "="},
+		{token.IDENT, "i"},
+		{token.PLUS, "+"},
+		{token.INT, "1"},
+		{token.RPAREN, ")"},
+
 		{token.EOF, ""},
 	}
 

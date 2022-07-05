@@ -216,13 +216,18 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 func (p *Parser) parseStatement() ast.Statement {
-	switch p.curToken.Type {
-	case token.LET:
+	tokenType := p.curToken.Type
+
+	switch {
+	case tokenType == token.LET:
 		return p.parseLetStatement()
-	case token.RETURN:
+	case tokenType == token.RETURN:
 		return p.parseReturnStatement()
-	case token.COMMENT:
+	case tokenType == token.COMMENT:
 		return nil
+	case tokenType == token.IDENT &&
+		p.peekTokenIs(token.ASSIGN):
+		return p.parseAssignStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -234,6 +239,26 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
+
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	// get value
+	p.nextToken()
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseAssignStatement() *ast.AssignStatement {
+	stmt := &ast.AssignStatement{Token: p.curToken}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 

@@ -27,3 +27,21 @@ func TestString(t *testing.T) {
 		t.Errorf("program.String() wrong. got=%q", program.String())
 	}
 }
+
+func TestAssignString(t *testing.T) {
+	exp := &AssignStatement{
+		Token: token.Token{Type: token.IDENT, Literal: "myX"},
+		Name: &Identifier{
+			Token: token.Token{Type: token.IDENT, Literal: "myX"},
+			Value: "myVar",
+		},
+		Value: &Identifier{
+			Token: token.Token{Type: token.IDENT, Literal: "anotherVar"},
+			Value: "anotherVar",
+		},
+	}
+
+	if exp.String() != "myVar = anotherVar;" {
+		t.Errorf("exp.String() wrong. got=%q", exp.String())
+	}
+}

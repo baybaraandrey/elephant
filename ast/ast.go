@@ -44,6 +44,28 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+type AssignStatement struct {
+	Token token.Token // the token.IDENT
+	Name  *Identifier
+	Value Expression
+}
+
+func (ae *AssignStatement) statementNode()       {}
+func (ae *AssignStatement) TokenLiteral() string { return ae.Token.Literal }
+func (ae *AssignStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(ae.Name.String())
+	out.WriteString(" = ")
+
+	if ae.Value != nil {
+		out.WriteString(ae.Value.String())
+	}
+	out.WriteString(";")
+
+	return out.String()
+}
+
 type LetStatement struct {
 	Token token.Token // the token.LET token
 	Name  *Identifier
@@ -340,4 +362,12 @@ func (hl *HashLiteral) String() string {
 	out.WriteString("}")
 
 	return out.String()
+}
+
+type ForStatement struct {
+	Token token.Token // the 'for' token
+	Init  Statement
+	Cond  Expression
+	Post  Statement
+	Body  *BlockStatement
 }
