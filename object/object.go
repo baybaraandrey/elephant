@@ -21,6 +21,7 @@ const (
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
 	HASH_OBJ         = "HASH"
+	FORLOOP_OBJ      = "FORLOOP"
 	NULL_OBJ         = "NULL"
 )
 
@@ -65,6 +66,34 @@ type Error struct {
 
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
+
+type ForLoop struct {
+	Init *ast.AssignStatement
+	Cond ast.Expression
+	Post *ast.AssignStatement
+	Body *ast.BlockStatement
+	Env  *Environment
+}
+
+func (fl *ForLoop) Type() ObjectType { return FORLOOP_OBJ }
+func (fl *ForLoop) Inspect() string {
+	var out bytes.Buffer
+
+	out.WriteString("for")
+	out.WriteString("(")
+	out.WriteString(fl.Init.String())
+	out.WriteString(fl.Cond.String())
+	out.WriteString(";")
+	out.WriteString(fl.Post.String())
+	out.WriteString(")")
+	out.WriteString("{")
+	if fl.Body != nil {
+		out.WriteString(fl.Body.String())
+	}
+	out.WriteString("}")
+
+	return out.String()
+}
 
 type Function struct {
 	Name       *ast.Identifier

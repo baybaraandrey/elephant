@@ -61,6 +61,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return val
 		}
 		env.Set(node.Name.Value, val)
+
 	case *ast.AssignStatement:
 		val := Eval(node.Value, env)
 		if isError(val) {
@@ -78,6 +79,15 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			env.Set(name.String(), function)
 		}
 		return function
+	case *ast.ForStatement:
+		loop := &object.ForLoop{
+			Init: node.Init.(*ast.AssignStatement),
+			Cond: node.Cond,
+			Post: node.Post.(*ast.AssignStatement),
+			Body: node.Body,
+		}
+		return runForLoop(loop, env)
+
 	case *ast.CallExpression:
 		function := Eval(node.Function, env)
 		if isError(function) {
@@ -178,6 +188,44 @@ func evalArrayIndexExpression(array, index object.Object) object.Object {
 	return arrayObject.Elements[idx]
 }
 
+func runForLoop(loop object.Object, env *object.Environment) object.Object {
+	switch loop := loop.(type) {
+	case *object.ForLoop:
+		loop.Env = env
+		extendedEnv := extendForLoopEnv(loop, []object.Object{})
+		initVal := Eval(loop.Init, extendedEnv)
+		if isError(initVal) {
+			return initVal
+		}
+
+		condExpr := Eval(loop.Cond, extendedEnv)
+		if isError(condExpr) {
+			return condExpr
+		}
+
+		for isTruthy(condExpr) {
+			evaluated := Eval(loop.Body, extendedEnv)
+			if isError(evaluated) {
+				return evaluated
+			}
+
+			post := Eval(loop.Post, extendedEnv)
+			if isError(post) {
+				return post
+			}
+
+			condExpr = Eval(loop.Cond, extendedEnv)
+			if isError(condExpr) {
+				return condExpr
+			}
+		}
+
+		return nil
+	default:
+		return newError("not a ForLoop: %s", loop.Type())
+	}
+}
+
 func applyFunction(fn object.Object, args []object.Object) object.Object {
 
 	switch fn := fn.(type) {
@@ -191,6 +239,14 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		return newError("not a function: %s", fn.Type())
 	}
 
+}
+
+func extendForLoopEnv(
+	loop *object.ForLoop,
+	args []object.Object,
+) *object.Environment {
+	env := object.NewEnclosedEnvironment(loop.Env)
+	return env
 }
 
 func extendFunctionEnv(
