@@ -11,7 +11,10 @@ import (
 	"github.com/baybaraandrey/elephant/repl"
 )
 
-var debug = flag.Bool("d", false, "debug mode")
+var (
+	debug = flag.Bool("d", false, "debug mode")
+	comp  = flag.Bool("c", false, "compiler mode")
+)
 
 func main() {
 	flag.Parse()
@@ -21,7 +24,11 @@ func main() {
 		panic(err)
 	}
 
-	conf := config.Config{Debug: *debug, Mode: config.INTERACTIVE}
+	conf := config.Config{
+		Debug:        *debug,
+		Mode:         config.INTERACTIVE,
+		CompilerMode: *comp,
+	}
 
 	if len(args) > 0 {
 		conf.Mode = config.FROM_FILE

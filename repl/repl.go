@@ -7,11 +7,13 @@ import (
 	"io/ioutil"
 	"log"
 
+	"github.com/baybaraandrey/elephant/compiler"
 	"github.com/baybaraandrey/elephant/config"
 	"github.com/baybaraandrey/elephant/evaluator"
 	"github.com/baybaraandrey/elephant/lexer"
 	"github.com/baybaraandrey/elephant/object"
 	"github.com/baybaraandrey/elephant/parser"
+	"github.com/baybaraandrey/elephant/vm"
 )
 
 const PROMPT = ">>> "
@@ -39,10 +41,31 @@ func Start(in io.Reader, out io.Writer, conf config.Config) {
 				continue
 			}
 
-			evaluated := evaluator.Eval(program, env)
-			if evaluated != nil {
-				io.WriteString(out, evaluated.Inspect())
+			if conf.CompilerMode == true {
+				comp := compiler.New()
+				err := comp.Compile(program)
+				if err != nil {
+					fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+					continue
+				}
+
+				machine := vm.New(comp.Bytecode())
+				err = machine.Run()
+				if err != nil {
+					fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+					continue
+				}
+				stackTop := machine.StackTop()
+				io.WriteString(out, stackTop.Inspect())
 				io.WriteString(out, "\n")
+
+			} else {
+
+				evaluated := evaluator.Eval(program, env)
+				if evaluated != nil {
+					io.WriteString(out, evaluated.Inspect())
+					io.WriteString(out, "\n")
+				}
 			}
 		}
 	} else {

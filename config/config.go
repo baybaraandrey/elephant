@@ -9,6 +9,7 @@ const (
 )
 
 type Config struct {
-	Mode  ReplMode
-	Debug bool
+	Mode         ReplMode
+	Debug        bool
+	CompilerMode bool
 }
