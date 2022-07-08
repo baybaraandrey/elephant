@@ -1,12 +1,13 @@
 
 fn pow (base, exp) {
-    result = base;
+    result = {"res": base};
     for (i = 0; i<exp; i = i + 1;) {
-        result = result * base;
-        print("result:",result);
+        r  = result["res"] * base;
+        result["res"] = r;
+        print("result:",r);
     }
     return result;
 }
 
-print(pow(2, 3));
+print(pow(2, 4));
 

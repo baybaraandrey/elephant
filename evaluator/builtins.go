@@ -14,6 +14,7 @@ func init() {
 	registerBuiltin("print", bprint)
 	registerBuiltin("exit", bexit)
 	registerBuiltin("locals", blocals)
+	registerBuiltin("type", btype)
 }
 
 func registerBuiltin(
@@ -43,11 +44,19 @@ func blen(env *object.Environment, args ...object.Object) object.Object {
 
 }
 
+func btype(env *object.Environment, args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("wrong number of arguments. got=%d, want=1",
+			len(args))
+	}
+	return &object.ObjType{Value: string(args[0].Type())}
+}
+
 func blocals(env *object.Environment, args ...object.Object) object.Object {
 	if env != nil {
-		fmt.Printf("%s\n", env.String())
+		return env.ToHash()
 	}
-	return nil
+	return NULL
 }
 
 func bfirst(env *object.Environment, args ...object.Object) object.Object {

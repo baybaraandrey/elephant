@@ -21,6 +21,7 @@ const (
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
 	HASH_OBJ         = "HASH"
+	TYPE_OBJ         = "TYPE"
 	FORLOOP_OBJ      = "FORLOOP"
 	NULL_OBJ         = "NULL"
 )
@@ -32,6 +33,18 @@ type Object interface {
 
 type Hashable interface {
 	HashKey() HashKey
+}
+
+type ObjType struct {
+	Value string
+}
+
+func (ot *ObjType) Type() ObjectType {
+	return TYPE_OBJ
+}
+
+func (ot *ObjType) Inspect() string {
+	return ot.Value
 }
 
 type Integer struct {
