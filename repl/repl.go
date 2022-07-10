@@ -55,10 +55,11 @@ func Start(in io.Reader, out io.Writer, conf config.Config) {
 					fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
 					continue
 				}
-				stackTop := machine.StackTop()
-				io.WriteString(out, stackTop.Inspect())
-				io.WriteString(out, "\n")
-
+				stackTop := machine.LastPoppedStackElem()
+				if stackTop != nil {
+					io.WriteString(out, stackTop.Inspect())
+					io.WriteString(out, "\n")
+				}
 			} else {
 
 				evaluated := evaluator.Eval(program, env)
